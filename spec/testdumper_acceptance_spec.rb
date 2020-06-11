@@ -2,6 +2,10 @@ require 'spec_helper'
 require 'set'
 
 EXPECTED_OUTPUT = <<eof
+{"message":"Starting Test Dumper","event":"begin-test-suite","testType":"APPTEST"}
+{"event":"begin-ocunit","bundleName":"CommonTestTarget.xctest","targetName":"CommonTestTarget"}
+{"test":"1","className":"CommonTestClass","event":"end-test","totalDuration":"0"}
+{"message":"Completed Test Dumper","event":"end-action","testType":"APPTEST"}
 {"message":"Starting Test Dumper","event":"begin-test-suite","testType":"LOGICTEST"}
 {"event":"begin-ocunit","bundleName":"iPhoneTestTarget.xctest","targetName":"iPhoneTestTarget"}
 {"test":"1","className":"iPhoneTestClassAlpha","event":"end-test","totalDuration":"0"}
@@ -10,14 +14,34 @@ EXPECTED_OUTPUT = <<eof
 {"test":"1","className":"iPhoneTestClassGama","event":"end-test","totalDuration":"0"}
 {"test":"1","className":"iPhoneTestClassOmega","event":"end-test","totalDuration":"0"}
 {"message":"Completed Test Dumper","event":"end-action","testType":"LOGICTEST"}
+{"message":"Starting Test Dumper","event":"begin-test-suite","testType":"LOGICTEST"}
+{"event":"begin-ocunit","bundleName":"SwiftTestTarget.xctest","targetName":"SwiftTestTarget"}
+{"test":"1","className":"ObjCTestClass","event":"end-test","totalDuration":"0"}
+{"test":"1","className":"SwiftTestTarget","event":"end-test","totalDuration":"0"}
+{"message":"Completed Test Dumper","event":"end-action","testType":"LOGICTEST"}
+{"message":"Starting Test Dumper","event":"begin-test-suite","testType":"APPTEST"}
+{"event":"begin-ocunit","bundleName":"iPadTestTarget.xctest","targetName":"iPadTestTarget"}
+{"test":"1","className":"iPadTestClassFour","event":"end-test","totalDuration":"0"}
+{"test":"1","className":"iPadTestClassOne","event":"end-test","totalDuration":"0"}
+{"test":"1","className":"iPadTestClassThree","event":"end-test","totalDuration":"0"}
+{"test":"1","className":"iPadTestClassTwo","event":"end-test","totalDuration":"0"}
+{"message":"Completed Test Dumper","event":"end-action","testType":"APPTEST"}
+eof
+
+EXPECTED_OUTPUT2 = <<eof
 {"message":"Starting Test Dumper","event":"begin-test-suite","testType":"APPTEST"}
 {"event":"begin-ocunit","bundleName":"CommonTestTarget.xctest","targetName":"CommonTestTarget"}
 {"test":"1","className":"CommonTestClass","event":"end-test","totalDuration":"0"}
 {"message":"Completed Test Dumper","event":"end-action","testType":"APPTEST"}
 {"message":"Starting Test Dumper","event":"begin-test-suite","testType":"LOGICTEST"}
-{"event":"begin-ocunit","bundleName":"SwiftTestTarget.xctest","targetName":"SwiftTestTarget"}
-{"test":"1","className":"ObjCTestClass","event":"end-test","totalDuration":"0"}
-{"test":"1","className":"SwiftTestTarget","event":"end-test","totalDuration":"0"}
+{"event":"begin-ocunit","bundleName":"iPhoneTestTarget.xctest","targetName":"iPhoneTestTarget"}
+{"test":"1","className":"iPhoneTestClassAlpha","event":"end-test","totalDuration":"0"}
+{"test":"1","className":"iPhoneTestClassBeta","event":"end-test","totalDuration":"0"}
+{"test":"1","className":"iPhoneTestClassDelta","event":"end-test","totalDuration":"0"}
+{"test":"1","className":"iPhoneTestClassGama","event":"end-test","totalDuration":"0"}
+{"test":"1","className":"iPhoneTestClassOmega","event":"end-test","totalDuration":"0"}
+{"message":"Completed Test Dumper","event":"end-action","testType":"LOGICTEST"}
+{"message":"Starting Test Dumper","event":"begin-test-suite","testType":"LOGICTEST"}
 {"message":"Completed Test Dumper","event":"end-action","testType":"LOGICTEST"}
 {"message":"Starting Test Dumper","event":"begin-test-suite","testType":"APPTEST"}
 {"event":"begin-ocunit","bundleName":"iPadTestTarget.xctest","targetName":"iPadTestTarget"}
@@ -92,7 +116,7 @@ describe "Test Dumper Acceptance", if: RUBY_PLATFORM.include?('darwin') do
 
   it "run test dumper on example project" do
     expect { XCKnife::TestDumper.new([derived_data_path, outpath, simulator_uuid], logger: logger).run }.not_to raise_error
-    expect(IO.read(outpath).lines).to eq(EXPECTED_OUTPUT.lines)
+    expect(IO.read(outpath).lines.sort).to eq(EXPECTED_OUTPUT2.lines.sort)
   end
 
   it "dumps tests using nm on example project" do
@@ -100,6 +124,6 @@ describe "Test Dumper Acceptance", if: RUBY_PLATFORM.include?('darwin') do
     expect_any_instance_of(XCKnife::TestDumperHelper).to receive(:list_tests_with_nm).exactly(3).times.and_call_original
     expect_any_instance_of(XCKnife::TestDumperHelper).to receive(:list_tests_with_simctl).once.and_call_original
     expect { XCKnife::TestDumper.new([derived_data_path, outpath, simulator_uuid, '--naive-dump', test_bundle_names.join(',')], logger: logger).run }.not_to raise_error
-    expect(IO.read(outpath).lines).to eq(EXPECTED_OUTPUT.lines)
+    expect(IO.read(outpath).lines.sort).to eq(EXPECTED_OUTPUT.lines.sort)
   end
 end
