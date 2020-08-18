@@ -1,3 +1,4 @@
+require 'appmap/rspec'
 require 'bundler/setup'
 require 'xcknife'
 require 'set'
