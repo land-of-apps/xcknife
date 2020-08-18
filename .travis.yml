@@ -11,4 +11,5 @@ install: bundle
 script:
   - csrutil status
   - git submodule update --init --recursive
-  - bundle exec rake build_test_dumper spec
+  - bundle exec rspec spec
+#  - bundle exec rake build_test_dumper spec
