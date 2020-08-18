@@ -5,11 +5,13 @@ matrix:
     - os: osx
       osx_image: xcode10.2
 
-before_script:
-  - export LANG=en_US.UTF-8
-install: bundle
+import:
+- land-of-apps/land-of-apps:travis/ruby-imports.yml
+
 script:
   - csrutil status
   - git submodule update --init --recursive
-  - bundle exec rspec spec
-#  - bundle exec rake build_test_dumper spec
+  - APPMAP=true bundle exec rspec spec
+
+after_script:
+- env DEBUG=true ruby ./upload-appmaps tmp/appmap/rspec/*
